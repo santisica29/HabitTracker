@@ -62,9 +62,9 @@ class Program
                 case "3":
                     Delete();
                     break;
-                //case 4:
-                //    Update();
-                //    break;
+                case "4":
+                    Update();
+                    break;
                 default:
                     Console.WriteLine("\nInvalid Command. PLease type a number from 0 to 4.\n");
                     break;
@@ -72,12 +72,49 @@ class Program
         }
     }
 
+    private static void Update()
+    {
+        Console.Clear();
+        GetAllRecords();
+
+        var recordId = GetNumberInput("\n\nPlease type the Id of the record you would like to update. Type 0 to return to Main Menu \n\n");
+
+        using var connection = new SqliteConnection(connectionString);
+
+        connection.Open();
+
+        var checkCmd = connection.CreateCommand();
+        checkCmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM drinking_water WHERE Id = {recordId})";
+        int checkQuery = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+        if (checkQuery == 0)
+        {
+            Console.WriteLine($"\nRecord with Id {recordId} doesn't exist.");
+            Console.ReadLine();
+            connection.Close();
+            Update();
+        }
+
+        string date = GetDateInput();
+
+        int quantity = GetNumberInput("\nPlease insert the number of glasses or other measure of your choice (no decimals allowed)\n");
+
+        var tableCmd = connection.CreateCommand();
+        tableCmd.CommandText = $"UPDATE drinking_water SET date = '{date}', quantity = {quantity} WHERE Id = {recordId}";
+
+        Console.WriteLine($"Record with Id {recordId} was updated.");
+
+        tableCmd.ExecuteNonQuery();
+
+        connection.Close();
+    }
+
     private static void Delete()
     {
         Console.Clear();
         GetAllRecords();
 
-        var recordId = GetNumberInput("\n\nPlease type the Id of the record you want to delete or type 0 to go to Main Menu \n\n");
+        var recordId = GetNumberInput("\n\nPlease type the Id of the record you would like to delete. Type 0 to return to Main Menu \n\n");
 
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -89,15 +126,18 @@ class Program
 
             if (rowCount == 0)
             {
-                Console.WriteLine($"\n\nRecord with Id {recordId} doesn't exist. \n\n");
+                Console.WriteLine($"\n\nRecord with Id {recordId} doesn't exist.");
+                Console.ReadLine();
                 Delete();
             }
         }
 
-        Console.WriteLine($"\n\nRecord with Id {recordId} was deleted. \n\n");
+        Console.WriteLine($"\n\nRecord with Id {recordId} was deleted.");
+        Console.ReadLine();
 
         GetUserInput();
     }
+
     internal static void GetAllRecords()
     {
         Console.Clear();

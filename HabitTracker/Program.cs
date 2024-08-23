@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.VisualBasic.FileIO;
 
 string connectionString = @"Data Source=habit-Tracker.db";
 
@@ -19,6 +18,8 @@ using (var connection = new SqliteConnection(connectionString))
 
     connection.Close();
 }
+
+GetUserInput();
 
 static void GetUserInput()
 {
@@ -64,6 +65,47 @@ static void GetUserInput()
 
 static void Insert()
 {
-    throw new NotImplementedException();
+    string connectionString = @"Data Source=habit-Tracker.db";
+
+    string date = GetDateInput();
+
+    int quantity = GetNumberInput("\n\nPlease insert a number of glasses or other measure fo your choise (no decimals allowed)\n\n");
+
+    using (var connection = new SqliteConnection(connectionString))
+    {
+        connection.Open();
+        var tableCmd = connection.CreateCommand();
+
+        tableCmd.CommandText =
+           $"INSERT INTO drinking_water(date, quantity) VALUES ('{date}',{quantity})";
+
+        tableCmd.ExecuteNonQuery();
+
+        connection.Close();
+    }
 }
 
+static int GetNumberInput(string str)
+{
+    Console.WriteLine(str);
+
+    string numInput = Console.ReadLine();
+
+    if (numInput == "0") GetUserInput();
+
+    int finalInput = Convert.ToInt32(numInput);
+
+    return finalInput;
+
+}
+
+static string GetDateInput()
+{
+    Console.WriteLine("\n\nPlease insert the date: (Format: dd-mm-yy). Type 0 to return to main menu.");
+
+    string dateInput = Console.ReadLine();
+
+    if (dateInput == "0") GetUserInput();
+
+    return dateInput;
+}

@@ -52,6 +52,7 @@ class Program
                 case "0":
                     Console.WriteLine("\nGoodbye!\n");
                     closeApp = true;
+                    Environment.Exit(0);
                     break;
                 case "1":
                     GetAllRecords();
@@ -209,6 +210,13 @@ class Program
 
         if (numInput == "0") GetUserInput();
 
+        while (!Int32.TryParse(numInput, out _) || Convert.ToInt32(numInput) < 0)
+        {
+            Console.WriteLine("\nInvalid number. Try again:\n");
+
+            numInput = Console.ReadLine();
+        }
+
         int finalInput = Convert.ToInt32(numInput);
 
         return finalInput;
@@ -222,6 +230,13 @@ class Program
         string dateInput = Console.ReadLine();
 
         if (dateInput == "0") GetUserInput();
+
+        while (!DateTime.TryParseExact(dateInput, "dd-MM-yy", new CultureInfo("en-US"), DateTimeStyles.None, out _))
+        {
+            Console.WriteLine("\nInvalid date. (Format: dd-mm-yy). Type 0 to return to main menu or try again:\n");
+
+            dateInput = Console.ReadLine();
+        }
 
         return dateInput;
     }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
-
+using Microsoft.VisualBasic.FileIO;
 
 string connectionString = @"Data Source=habit-Tracker.db";
 
@@ -8,7 +8,7 @@ using (var connection = new SqliteConnection(connectionString))
     connection.Open();
     var tableCmd = connection.CreateCommand();
 
-    tableCmd.CommandText = 
+    tableCmd.CommandText =
         @"CREATE TABLE IF NOT EXISTS drinking_water (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Date TEXT,
@@ -37,6 +37,33 @@ static void GetUserInput()
 
         string input = Console.ReadLine();
 
-
+        switch (input)
+        {
+            case "0":
+                Console.WriteLine("\nGoodbye!\n");
+                closeApp = true;
+                break;
+            //case 1:
+            //    GetAllRecords();
+            //    break;
+            case "2":
+                Insert();
+                break;
+            //case 3:
+            //    Delete();
+            //    break;
+            //case 4:
+            //    Update();
+            //    break;
+            default:
+                Console.WriteLine("\nInvalid Command. PLease type a number from 0 to 4.\n");
+                break;
+        }
     }
 }
+
+static void Insert()
+{
+    throw new NotImplementedException();
+}
+

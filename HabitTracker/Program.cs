@@ -139,6 +139,26 @@ class Program
         GetUserInput();
     }
 
+    private static void Insert()
+    {
+        string date = GetDateInput();
+
+        int quantity = GetNumberInput("\n\nPlease insert a number of glasses or other measure fo your choise (no decimals allowed)\n\n");
+
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var tableCmd = connection.CreateCommand();
+
+            tableCmd.CommandText =
+               $"INSERT INTO drinking_water(date, quantity) VALUES ('{date}',{quantity})";
+
+            tableCmd.ExecuteNonQuery();
+
+            connection.Close();
+        }
+    }
+
     internal static void GetAllRecords()
     {
         Console.Clear();
@@ -182,26 +202,6 @@ class Program
         Console.WriteLine("-------------------------------\n");
     }
 
-    private static void Insert()
-    {
-        string date = GetDateInput();
-
-        int quantity = GetNumberInput("\n\nPlease insert a number of glasses or other measure fo your choise (no decimals allowed)\n\n");
-
-        using (var connection = new SqliteConnection(connectionString))
-        {
-            connection.Open();
-            var tableCmd = connection.CreateCommand();
-
-            tableCmd.CommandText =
-               $"INSERT INTO drinking_water(date, quantity) VALUES ('{date}',{quantity})";
-
-            tableCmd.ExecuteNonQuery();
-
-            connection.Close();
-        }
-    }
-
     internal static int GetNumberInput(string str)
     {
         Console.WriteLine(str);
@@ -225,18 +225,20 @@ class Program
 
     internal static string GetDateInput()
     {
-        Console.WriteLine("\n\nPlease insert the date: (Format: dd-mm-yy). Type 0 to return to main menu.");
+        Console.WriteLine("\n\nPlease insert the date: (Format: dd-mm-yy). Type 't' to enter today's date. Type 0 to return to main menu.");
 
         string dateInput = Console.ReadLine();
-
-        if (dateInput == "0") GetUserInput();
-
-        while (!DateTime.TryParseExact(dateInput, "dd-MM-yy", new CultureInfo("en-US"), DateTimeStyles.None, out _))
+        
+        while (!DateTime.TryParseExact(dateInput, "dd-MM-yy", new CultureInfo("en-US"), DateTimeStyles.None, out _) && dateInput != "t" && dateInput != "0")
         {
-            Console.WriteLine("\nInvalid date. (Format: dd-mm-yy). Type 0 to return to main menu or try again:\n");
+            Console.WriteLine("\nInvalid date. (Format: dd-mm-yy). Type 't', type 0 to return to main menu or try again:\n");
 
             dateInput = Console.ReadLine();
         }
+
+        if (dateInput == "0") GetUserInput();
+
+        if (dateInput.ToLower() == "t") dateInput = DateTime.Now.ToString("dd-MM-yy");
 
         return dateInput;
     }

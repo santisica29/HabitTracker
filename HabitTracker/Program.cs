@@ -6,7 +6,7 @@ namespace HabitTrackerProgram;
 
 class Program
 {
-    static string connectionString = @"Data Source=habit-Tracker.db";
+    static string connectionString = @"Data Source=habit_tracker.db";
 
     static void Main(string[] args)
     {
@@ -16,7 +16,7 @@ class Program
             var tableCmd = connection.CreateCommand();
 
             tableCmd.CommandText =
-                @"CREATE TABLE IF NOT EXISTS drinking_water (
+            @"CREATE TABLE IF NOT EXISTS habit_tracker (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Date TEXT,
             Quantity INTEGER
@@ -34,6 +34,7 @@ class Program
     {
         Console.Clear();
         bool closeApp = false;
+
         while (closeApp == false)
         {
             Console.WriteLine("\n\nMAIN MENU");
@@ -85,7 +86,7 @@ class Program
         connection.Open();
 
         var checkCmd = connection.CreateCommand();
-        checkCmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM drinking_water WHERE Id = {recordId})";
+        checkCmd.CommandText = $"SELECT EXISTS(SELECT 1 FROM habit_tracker WHERE Id = {recordId})";
         int checkQuery = Convert.ToInt32(checkCmd.ExecuteScalar());
 
         if (checkQuery == 0)
@@ -101,7 +102,7 @@ class Program
         int quantity = GetNumberInput("\nPlease insert the number of glasses or other measure of your choice (no decimals allowed)\n");
 
         var tableCmd = connection.CreateCommand();
-        tableCmd.CommandText = $"UPDATE drinking_water SET date = '{date}', quantity = {quantity} WHERE Id = {recordId}";
+        tableCmd.CommandText = $"UPDATE habit_tracker SET date = '{date}', quantity = {quantity} WHERE Id = {recordId}";
 
         Console.WriteLine($"Record with Id {recordId} was updated.");
 
@@ -121,7 +122,7 @@ class Program
         {
             connection.Open();
             var tableCmd = connection.CreateCommand();
-            tableCmd.CommandText = $"DELETE from drinking_water WHERE Id = '{recordId}'";
+            tableCmd.CommandText = $"DELETE from habit_tracker WHERE Id = '{recordId}'";
 
             int rowCount = tableCmd.ExecuteNonQuery();
 
@@ -143,7 +144,7 @@ class Program
     {
         string date = GetDateInput();
 
-        int quantity = GetNumberInput("\n\nPlease insert a number of glasses or other measure fo your choise (no decimals allowed)\n\n");
+        int quantity = GetNumberInput("\n\nPlease insert a number of glasses or other measure for your choice (no decimals allowed)\n\n");
 
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -151,7 +152,7 @@ class Program
             var tableCmd = connection.CreateCommand();
 
             tableCmd.CommandText =
-               $"INSERT INTO drinking_water(date, quantity) VALUES ('{date}',{quantity})";
+               $"INSERT INTO habit_tracker(date, quantity) VALUES ('{date}',{quantity})";
 
             tableCmd.ExecuteNonQuery();
 
@@ -168,9 +169,9 @@ class Program
         connection.Open();
         var tableCmd = connection.CreateCommand();
         tableCmd.CommandText =
-           $"SELECT * FROM drinking_water";
+           $"SELECT * FROM habit_tracker";
 
-        List<DrinkingWater> tableData = new();
+        List<Habit> tableData = new();
 
         SqliteDataReader reader = tableCmd.ExecuteReader();
 
@@ -179,7 +180,7 @@ class Program
             while (reader.Read())
             {
                 tableData.Add(
-                new DrinkingWater
+                new Habit
                 {
                     Id = reader.GetInt32(0),
                     Date = DateTime.ParseExact(reader.GetString(1), "dd-MM-yy", new CultureInfo("en-US")),
@@ -244,9 +245,10 @@ class Program
     }
 }
 
-public class DrinkingWater
+public class Habit
 {
     public int Id { get; set; }
+    public string Name { get; set; }
     public DateTime Date { get; set; }
     public int Quantitiy { get; set; }
 }
